@@ -27,22 +27,7 @@ class Minimizer(object):
 
 
 def find_best_shift_minimize(ref, input):
-    # minimize_result = minimize(Minimizer(ref, input), [0.0, 0.0], bounds=[
-    #    (-10, 10), (-10, 10)], options={'maxiter': 1000, 'disp': True, 'eps': 0.1})
-
     minimize_result = basinhopping(Minimizer(ref, input), [
-                                   0.0, 0.0], niter=100, interval=10, disp=True, seed=1)
+                                   0.0, 0.0], niter=100, interval=10, disp=True, seed=1, minimizer_kwargs={'options': {'eps': 0.5}})
     print(minimize_result)
     return minimize_result.x
-
-
-def find_alignment(loaded_images):
-    alignments = [(0, 0, 0)]
-    ref = to_grayscale(loaded_images[0])
-
-    for i in range(1, len(loaded_images)):
-        shift = find_best_shift(ref, to_grayscale(
-            loaded_images[i]), -1, 1, step=1)
-        alignments.extend([shift])
-
-    return alignments
