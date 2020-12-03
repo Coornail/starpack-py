@@ -2,40 +2,17 @@ import numpy as np
 from scipy.ndimage import shift
 from scipy.ndimage import rotate
 from scipy.optimize import basinhopping
-from scipy.optimize import minimize
-from multiprocessing import Pool
-import functools
+
+import numexpr as ne
 
 from color import to_grayscale
-
-
-# def find_best_shift(ref, input, min, max, step=1):
-#     bestx = 0
-#     besty = 0
-#     best_angle = 0
-#     bestdiff = float('inf')
-
-#     for x in np.arange(min, max, step):
-#         for y in np.arange(min, max, step):
-#             for angle in np.arange(min*10, max*10, step*10):
-#                 out = rotate(input, angle, reshape=False)
-#                 out = shift(out, (x, y))
-#                 diff = (abs(ref-out)).sum()
-#                 if diff < bestdiff:
-#                     print(x, y, angle, diff)
-#                     bestx = x
-#                     besty = y
-#                     best_angle = angle
-#                     bestdiff = diff
-#         print((x+abs(min))/(abs(min)+max)*100, "%")
-
-#     return(bestx, besty, best_angle)
 
 
 def alignment_score(xshift, yshift, angle, ref, input):
     out = rotate(input, angle, reshape=False)
     out = shift(out, (xshift, yshift))
-    diff = (abs(ref-out)).sum()
+    # diff = (abs(ref-out)).sum()
+    diff = ne.evaluate('abs(ref-out)').sum()
     print(xshift, yshift, angle, diff)
     return diff
 
