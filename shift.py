@@ -1,12 +1,14 @@
+import sys
+from os import walk
+
 import numpy as np
 from scipy.ndimage import shift
 from scipy.ndimage import rotate
 from scipy.optimize import basinhopping
-from os import walk
 import numexpr as ne
 from numpy import asarray, zeros_like
 from PIL import Image
-import sys
+from eta import ETA
 
 from color import to_grayscale
 
@@ -40,11 +42,16 @@ def starpack(image_paths):
     shifts = {image_paths[0]: [0.0, 0.0]}
     ref = asarray(Image.open(image_paths[0]))
     ref_bw = to_grayscale(ref)
+
+    eta = ETA(len(image_paths))
     for i in range(1, len(image_paths)):
+        print("Finding alignment for", image_paths[i])
         img = asarray(Image.open(image_paths[i]))
         img_bw = to_grayscale(img)
         s = find_best_shift_minimize(ref_bw, img_bw)
         shifts[image_paths[i]] = s
+        eta.print_status()
+    eta.done()
 
     out = zeros_like(ref, dtype=float)
     for file_name in shifts:
