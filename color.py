@@ -7,4 +7,7 @@ def to_grayscale(img):
         for j in range(img.shape[1]):
             bw[i, j] = img[i, j, 0]*.2126 + \
                 img[i, j, 1] * .7152 + img[i, j, 2] * .072
+
+    # Treshold image
+    bw[bw < 128] = 0
     return bw
