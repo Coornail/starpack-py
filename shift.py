@@ -57,7 +57,7 @@ def starpack(image_paths):
     for file_name in shifts:
         s = shifts[file_name]
         img = asarray(Image.open(file_name))
-        shifted_img = shift(img, (0, s[0], s[1]))
+        shifted_img = shift(img, (s[0], s[1], 0))
         out += shifted_img
 
     out /= len(image_paths)
@@ -77,7 +77,6 @@ def collect_images(dir):
 def main():
     image_paths = collect_images(sys.argv[1])
     img = starpack(image_paths)
-    print(img)
     Image.fromarray(img).save("out.tif")
 
 
