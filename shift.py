@@ -10,7 +10,7 @@ from numpy import asarray, zeros_like
 from PIL import Image
 from eta import ETA
 
-from color import to_grayscale
+from color import alignment_window
 
 
 def alignment_score(xshift, yshift, angle, ref, input):
@@ -28,11 +28,11 @@ class Minimizer(object):
         self.input = input
 
     def __call__(self, guess):
-        return round(alignment_score(guess[0], guess[1], 0, self.ref, self.input))
+        return alignment_score(guess[0], guess[1], 0, self.ref, self.input)
 
 
 def find_best_shift_minimize(ref, input):
-    return [0.0, 0.0]
+    # return [0.0, 0.0]
     minimize_result = basinhopping(Minimizer(ref, input), [
                                    0.0, 0.0], niter=10, interval=10, seed=1, minimizer_kwargs={'options': {'eps': 0.5}})
     return minimize_result.x
@@ -41,13 +41,13 @@ def find_best_shift_minimize(ref, input):
 def starpack(image_paths):
     shifts = {image_paths[0]: [0.0, 0.0]}
     ref = asarray(Image.open(image_paths[0]))
-    ref_bw = to_grayscale(ref)
+    ref_bw = alignment_window(ref, 512)
 
     eta = ETA(len(image_paths))
     for i in range(1, len(image_paths)):
-        print("Finding alignment for", image_paths[i])
+        # print("Finding alignment for", image_paths[i])
         img = asarray(Image.open(image_paths[i]))
-        img_bw = to_grayscale(img)
+        img_bw = alignment_window(img, 512)
         s = find_best_shift_minimize(ref_bw, img_bw)
         shifts[image_paths[i]] = s
         eta.print_status()
