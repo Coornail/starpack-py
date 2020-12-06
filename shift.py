@@ -1,6 +1,3 @@
-import sys
-from os import walk
-
 import numpy as np
 from scipy.ndimage import shift
 from scipy.ndimage import rotate
@@ -32,7 +29,9 @@ class Minimizer(object):
 
 
 def find_best_shift_minimize(ref, input):
-    # return [0.0, 0.0]
+    """
+    Find the best alignment for an image based on a reference image.
+    """
     minimize_result = basinhopping(Minimizer(ref, input), [
                                    0.0, 0.0], niter=10, interval=10, seed=1, minimizer_kwargs={'options': {'eps': 0.5}})
     return minimize_result.x
@@ -63,22 +62,3 @@ def starpack(image_paths):
     out /= len(image_paths)
 
     return out.astype(np.uint8)
-
-
-def collect_images(dir):
-    files = []
-    for (dirpath, dirnames, filenames) in walk(dir):
-        files.extend([dirpath + "/" + filename for filename in filenames if filename.endswith(
-            ".jpg") or filename.endswith(".png") or filename.endswith(".tif")])
-
-    return files
-
-
-def main():
-    image_paths = collect_images(sys.argv[1])
-    img = starpack(image_paths)
-    Image.fromarray(img).save("out.tif")
-
-
-if __name__ == "__main__":
-    main()
