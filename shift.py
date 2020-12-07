@@ -1,13 +1,6 @@
-import numpy as np
 from scipy.ndimage import shift
-from scipy.ndimage import rotate
 from scipy.optimize import basinhopping
 import numexpr as ne
-from numpy import asarray, zeros_like
-from PIL import Image
-from eta import ETA
-
-from color import alignment_window
 
 
 def alignment_score(xshift, yshift, angle, ref, input):
@@ -19,46 +12,19 @@ def alignment_score(xshift, yshift, angle, ref, input):
     return diff
 
 
-class Minimizer(object):
-    def __init__(self, ref, input):
-        self.ref = ref
-        self.input = input
-
-    def __call__(self, guess):
-        return alignment_score(guess[0], guess[1], 0, self.ref, self.input)
-
-
 def find_best_shift_minimize(ref, input):
     """
     Find the best alignment for an image based on a reference image.
     """
+
+    class Minimizer(object):
+        def __init__(self, ref, input):
+            self.ref = ref
+            self.input = input
+
+        def __call__(self, guess):
+            return alignment_score(guess[0], guess[1], 0, self.ref, self.input)
+
     minimize_result = basinhopping(Minimizer(ref, input), [
                                    0.0, 0.0], niter=10, interval=10, seed=1, minimizer_kwargs={'options': {'eps': 0.5}})
     return minimize_result.x
-
-
-def starpack(image_paths):
-    shifts = {image_paths[0]: [0.0, 0.0]}
-    ref = asarray(Image.open(image_paths[0]))
-    ref_bw = alignment_window(ref, 512)
-
-    eta = ETA(len(image_paths))
-    for i in range(1, len(image_paths)):
-        # print("Finding alignment for", image_paths[i])
-        img = asarray(Image.open(image_paths[i]))
-        img_bw = alignment_window(img, 512)
-        s = find_best_shift_minimize(ref_bw, img_bw)
-        shifts[image_paths[i]] = s
-        eta.print_status()
-    eta.done()
-
-    out = zeros_like(ref, dtype=float)
-    for file_name in shifts:
-        s = shifts[file_name]
-        img = asarray(Image.open(file_name))
-        shifted_img = shift(img, (s[0], s[1], 0))
-        out += shifted_img
-
-    out /= len(image_paths)
-
-    return out.astype(np.uint8)

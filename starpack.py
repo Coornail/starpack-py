@@ -2,7 +2,7 @@ import sys
 from PIL import Image
 from os import walk
 
-from shift import starpack
+from pack import starpack
 
 
 def collect_images(dir):
