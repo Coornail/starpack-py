@@ -15,7 +15,6 @@ def collect_images(dir):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     image_paths = collect_images(sys.argv[1])
     img = starpack(image_paths)
     Image.fromarray(img).save("out.tif")

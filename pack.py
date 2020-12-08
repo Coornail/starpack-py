@@ -3,7 +3,7 @@ from PIL import Image
 from numpy import asarray, zeros_like
 from scipy.ndimage import shift
 import numpy as np
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 
 from shift import find_best_shift_minimize
 from image import alignment_window
@@ -24,17 +24,16 @@ def starpack(image_paths, darkframe_paths=[]):
 
     # Prepare work
     work = []
-    for image_path in image_paths[0:]:
+    for image_path in image_paths[1:]:
         work.append((ref_bw, image_path))
 
     # Worker threads
-    p = Pool(4)
+    p = Pool(cpu_count())
     s = p.map(minimize, work)
 
     shifts = {image_paths[0]: [0.0, 0.0]}
-    for i in range(len(image_paths[0:])):
+    for i in range(len(image_paths[1:])):
         shifts[image_paths[i]] = s[i]
-    print(shifts)
 
     # Compile output file
     out = zeros_like(ref, dtype=float)
