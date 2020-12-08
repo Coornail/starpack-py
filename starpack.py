@@ -1,6 +1,6 @@
 import sys
-from PIL import Image
 from os import walk
+from tifffile import imwrite
 
 from pack import starpack
 
@@ -17,4 +17,4 @@ def collect_images(dir):
 if __name__ == "__main__":
     image_paths = collect_images(sys.argv[1])
     img = starpack(image_paths)
-    Image.fromarray(img).save("out.tif")
+    imwrite('out.tif', img, photometric='rgb')

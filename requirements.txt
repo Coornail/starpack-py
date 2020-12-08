@@ -2,3 +2,4 @@ numpy
 numexpr
 scipy
 ETA
+tifffile

@@ -49,7 +49,10 @@ def starpack(image_paths, darkframe_paths=[]):
         darkframe_master = starpack_unaligned(ref, darkframe_paths)
         out -= darkframe_master
 
-    return out.astype(np.uint8)
+    # We are writing a 16 bit image
+    out *= 2 << 7
+
+    return out.astype(np.uint16)
 
 
 def starpack_unaligned(ref, image_paths):
