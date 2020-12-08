@@ -15,7 +15,7 @@ def minimize(input):
 
     img = asarray(Image.open(image_path))
     img_bw = alignment_window(img, 512)
-    return find_best_shift_minimize(ref_bw, img_bw)
+    return (image_path, find_best_shift_minimize(ref_bw, img_bw))
 
 
 def starpack(image_paths, darkframe_paths=[]):
@@ -32,8 +32,8 @@ def starpack(image_paths, darkframe_paths=[]):
     s = p.map(minimize, work)
 
     shifts = {image_paths[0]: [0.0, 0.0]}
-    for i in range(len(image_paths[1:])):
-        shifts[image_paths[i]] = s[i]
+    for shift_result in s:
+        shifts[shift_result[0]] = shift_result[1]
 
     # Compile output file
     out = zeros_like(ref, dtype=float)
