@@ -18,7 +18,7 @@ def minimize(input):
     return (image_path, find_best_shift_minimize(ref_bw, img_bw))
 
 
-def starpack(image_paths, darkframe_paths=[]):
+def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
     ref = asarray(Image.open(image_paths[0]))
     ref_bw = alignment_window(ref, 512)
 
@@ -45,9 +45,16 @@ def starpack(image_paths, darkframe_paths=[]):
 
     out /= len(image_paths)
 
+    # Subtract dark frames
     if len(darkframe_paths):
         darkframe_master = starpack_unaligned(ref, darkframe_paths)
         out -= darkframe_master
+
+    # Subtract bias frames
+    if len(biasframe_paths):
+        biasframe_master = starpack_unaligned(ref, biasframe_paths)
+        out -= biasframe_master
+
 
     # We are writing a 16 bit image
     out *= 2 << 7

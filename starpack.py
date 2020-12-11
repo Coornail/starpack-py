@@ -1,6 +1,6 @@
-import sys
 from os import walk
 from tifffile import imwrite
+import argparse
 
 from pack import starpack
 
@@ -15,6 +15,21 @@ def collect_images(dir):
 
 
 if __name__ == "__main__":
-    image_paths = collect_images(sys.argv[1])
-    img = starpack(image_paths)
+    parser = argparse.ArgumentParser(
+        description='Stack deep-sky/planet images')
+    parser.add_argument('lights', help='light files')
+    parser.add_argument('--darks', nargs='?', help='dark files')
+    parser.add_argument('--bias', nargs='?', help='bias files')
+
+    args = parser.parse_args()
+
+    light_paths = collect_images(args.lights)
+    dark_paths = []
+    if (args.darks):
+        dark_paths = collect_images(args.darks)
+    bias_paths = []
+    if (args.bias):
+        dark_paths = collect_images(args.bias)
+
+    img = starpack(light_paths, darkframe_paths=dark_paths)
     imwrite('out.tif', img, photometric='rgb')
