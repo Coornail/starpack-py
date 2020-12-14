@@ -37,24 +37,24 @@ def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
 
     # Compile output file
     out = zeros_like(ref, dtype=float)
+    darkframe_master = zeros_like(ref, dtype=float)
+    biasframe_master = zeros_like(ref, dtype=float)
+    if len(darkframe_paths):
+        darkframe_master = starpack_unaligned(ref, darkframe_paths)
+
+    if len(biasframe_paths):
+        biasframe_master = starpack_unaligned(ref, biasframe_paths)
+
     for file_name in shifts:
         s = shifts[file_name]
         img = asarray(Image.open(file_name))
-        shifted_img = shift(img, (s[0], s[1], 0))
+        corrected_img = img - darkframe_master
+        corrected_img -= biasframe_master
+
+        shifted_img = shift(corrected_img, (s[0], s[1], 0))
         out += shifted_img
 
     out /= len(image_paths)
-
-    # Subtract dark frames
-    if len(darkframe_paths):
-        darkframe_master = starpack_unaligned(ref, darkframe_paths)
-        out -= darkframe_master
-
-    # Subtract bias frames
-    if len(biasframe_paths):
-        biasframe_master = starpack_unaligned(ref, biasframe_paths)
-        out -= biasframe_master
-
 
     # We are writing a 16 bit image
     out *= 2 << 7

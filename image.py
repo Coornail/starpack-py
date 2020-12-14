@@ -1,4 +1,3 @@
-from numpy import empty
 from numpy import dot
 
 
