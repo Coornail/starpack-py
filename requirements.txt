@@ -3,3 +3,4 @@ numexpr
 scipy
 ETA
 tifffile
+pillow
