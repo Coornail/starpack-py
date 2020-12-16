@@ -26,5 +26,5 @@ def find_best_shift_minimize(ref, input):
             return alignment_score(guess[0], guess[1], 0, self.ref, self.input)
 
     minimize_result = brute(Minimizer(ref, input), [
-                            (-400, 400), (-400, 400)], Ns=101)
-    return basinhopping(Minimizer(ref, input), minimize_result, seed=1, stepsize=0.5, minimizer_kwargs={'options': {'eps': 10}}).x
+            (-400, 400), (-400, 400)], Ns=101)
+    return basinhopping(Minimizer(ref, input), minimize_result, seed=1, minimizer_kwargs={'options': {'eps': 1, 'disp': 1}}).x
