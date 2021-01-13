@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3
+
 from os import walk
 from tifffile import imwrite
 import argparse
@@ -24,13 +26,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     light_paths = collect_images(args.lights)
+
     dark_paths = []
-    bias_paths = []
     if (args.darks):
         dark_paths = collect_images(args.darks)
+
     bias_paths = []
     if (args.bias):
         bias_paths = collect_images(args.bias)
 
-    img = starpack(light_paths, darkframe_paths=dark_paths)
+    img = starpack(light_paths, darkframe_paths=dark_paths,
+                   biasframe_paths=bias_paths)
     imwrite('out.tif', img, photometric='rgb')

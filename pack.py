@@ -1,37 +1,39 @@
-from eta import ETA
 from PIL import Image
 from numpy import asarray, zeros_like
 from scipy.ndimage import shift
 import numpy as np
 from multiprocessing import Pool, cpu_count
+import cv2
 
 from shift import find_best_shift_minimize
 from image import alignment_window
 
 
-def minimize(input):
-    ref_bw = input[0]
-    image_path = input[1]
+def minimize(inp):
+    ref_bw = inp[0]
+    image_path = inp[1]
 
     img = asarray(Image.open(image_path))
-    img_bw = alignment_window(img, 512)
-    return (image_path, find_best_shift_minimize(ref_bw, img_bw))
+    # return (image_path, find_best_shift_minimize(ref_bw, img_bw))
+    # return(image_path, find_best_shift_minimize(ref_bw, cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)))
+    return(image_path, find_best_shift_minimize(ref_bw, img))
 
 
 def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
     ref = asarray(Image.open(image_paths[0]))
-    ref_bw = alignment_window(ref, 512)
+    # ref_bw = alignment_window(ref, 512)
+    # ref_bw = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
 
     # Prepare work
     work = []
     for image_path in image_paths[1:]:
-        work.append((ref_bw, image_path))
+        work.append((ref, image_path))
 
     # Worker threads
     p = Pool(cpu_count())
     s = p.map(minimize, work)
 
-    shifts = {image_paths[0]: [0.0, 0.0]}
+    shifts = {image_paths[0]: np.eye(3, 3, dtype=np.float32)}
     for shift_result in s:
         shifts[shift_result[0]] = shift_result[1]
 
@@ -45,13 +47,15 @@ def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
     if len(biasframe_paths):
         biasframe_master = starpack_unaligned(ref, biasframe_paths)
 
+    print(shifts)
+    shape = ref.shape
     for file_name in shifts:
-        s = shifts[file_name]
         img = asarray(Image.open(file_name))
         corrected_img = img - darkframe_master
         corrected_img -= biasframe_master
 
-        shifted_img = shift(corrected_img, (s[0], s[1], 0))
+        shifted_img = cv2.warpPerspective(corrected_img, shifts[file_name], (
+            shape[1], shape[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
         out += shifted_img
 
     out /= len(image_paths)

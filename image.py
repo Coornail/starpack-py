@@ -1,4 +1,5 @@
 from numpy import dot
+import cv2
 
 
 def to_grayscale(img):
@@ -7,7 +8,7 @@ def to_grayscale(img):
 
     Based on https://stackoverflow.com/questions/12201577/how-can-i-convert-an-rgb-image-into-grayscale-in-python
     """
-    return dot(img[..., :3], [0.2989, 0.5870, 0.1140])
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 def alignment_window(img, window_size):
