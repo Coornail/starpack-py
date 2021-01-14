@@ -1,12 +1,10 @@
 from PIL import Image
 from numpy import asarray, zeros_like
-from scipy.ndimage import shift
 import numpy as np
 from multiprocessing import Pool, cpu_count
 import cv2
 
 from shift import find_best_shift_minimize
-from image import alignment_window
 
 
 def minimize(inp):
@@ -14,15 +12,11 @@ def minimize(inp):
     image_path = inp[1]
 
     img = asarray(Image.open(image_path))
-    # return (image_path, find_best_shift_minimize(ref_bw, img_bw))
-    # return(image_path, find_best_shift_minimize(ref_bw, cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)))
     return(image_path, find_best_shift_minimize(ref_bw, img))
 
 
 def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
     ref = asarray(Image.open(image_paths[0]))
-    # ref_bw = alignment_window(ref, 512)
-    # ref_bw = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
 
     # Prepare work
     work = []
