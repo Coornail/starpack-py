@@ -4,3 +4,4 @@ scipy
 ETA
 tifffile
 pillow
+opencv-python
