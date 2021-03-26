@@ -41,7 +41,6 @@ def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):
     if len(biasframe_paths):
         biasframe_master = starpack_unaligned(ref, biasframe_paths)
 
-    print(shifts)
     shape = ref.shape
     for file_name in shifts:
         img = asarray(Image.open(file_name))
