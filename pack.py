@@ -7,12 +7,26 @@ import cv2
 from shift import find_best_shift_minimize
 
 
+def treshold(img, threshold):
+    img_bw = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img2 = img_bw.copy()
+    img2[img2 < threshold] = 0
+    # imwrite('bw.tif', img2)
+    return img2
+
+
+def find_threshold(img):
+    img_bw = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return cv2.adaptiveThreshold(
+        img_bw, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
 def minimize(inp):
-    ref_bw = inp[0]
+    ref = inp[0]
     image_path = inp[1]
 
     img = asarray(Image.open(image_path))
-    return(image_path, find_best_shift_minimize(ref_bw, img))
+    threshold = find_threshold(ref)
+    return(image_path, find_best_shift_minimize(treshold(ref, threshold), treshold(img, threshold)))
 
 
 def starpack(image_paths, darkframe_paths=[], biasframe_paths=[]):

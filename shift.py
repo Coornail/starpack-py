@@ -21,13 +21,14 @@ def find_best_shift_minimize(ref, inp):
     matches.sort(key=lambda x: x.distance, reverse=False)
 
     # Remove not so good matches
-    num_good_matches = int(len(matches) * 0.005)
+    num_good_matches = int(len(matches) * 0.010)
+    num_good_matches = 1024*10
     matches = matches[:num_good_matches]
 
     # Draw top matches
-    # im_matches = cv2.drawMatches(
-    # ref, keypoints1, inp, keypoints2, matches, None)
-    # cv2.imwrite("matches.jpg", im_matches)
+    im_matches = cv2.drawMatches(
+        ref, keypoints1, inp, keypoints2, matches, None)
+    cv2.imwrite("matches.jpg", im_matches)
 
     # Extract location of good matches
     points1 = np.zeros((len(matches), 2), dtype=np.float32)
