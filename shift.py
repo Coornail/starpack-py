@@ -22,7 +22,7 @@ def find_best_shift_minimize(ref, inp):
 
     # Remove not so good matches
     num_good_matches = int(len(matches) * 0.010)
-    num_good_matches = 1024*10
+    num_good_matches = 1024
     matches = matches[:num_good_matches]
 
     # Draw top matches
